@@ -1,77 +1,13 @@
 import numpy as np
 from test_read_and_format import file_to_numpyarray_test, reformat_density_matrices, realArray_to_complexArray
-
-
-
-
-def hermiticity_test(input_array, N):
-    '''This function takes:
-    - input_array: (bidimensional square (NxN) complex numpy array)
-    - N: (integer) Dimension of the hilbert space.
-    
-    This function checks whether input_array is the matrix representation of an hermitian operator. It returns True 
-    if the input_array passed the test, and False otherwise.'''
-    
-    if type(input_array)!=type(np.array([])) or type(N)!=type(1):
-        print('hermiticity_test(), Err1')
-        return -1
-    if np.shape(input_array)!=(N,N):
-        print('hermiticity_test(), Err2')
-        return -1
-    if input_array.dtype!=np.empty((1,1),dtype=complex).dtype:
-        print('hermiticity_test(), Err3')
-        return -1
-
-
-    result = True
-    for i in range(N):
-        if input_array[i,i].imag!=0.0:
-            result = False
-    for j in range(i):
-        if input_array[i,j]!=np.conjugate(input_array[j,i]):
-            result = False
-    return result
-    
-    
-    
-    
-def unity_realtrace_test(input_array, N, tolerance):
-    '''This function takes:
-    - input_array: (bidimensional square complex array (NxN)).
-    - tolerance: (real scalar).
-    
-    This function calculates the real trace, TrR(), (i.e. the sum of the real parts of the diagonal elements) of 
-    the array and returns True if |1-TrR(input_array)|<tolerance. This test is meant to take place after having 
-    passed hermiticity_test() test. I.e. input_array has already been checked to have pure real diagonal elements
-    
-    IMPORTANT: Typically, the data received from D.M. passes the hermiticity test unconditionally, and the unity 
-    trace test for tolerance>=1e-5, which is of the order of the decimal precision of the received data.'''
-    
-    if type(input_array)!=type(np.array([])) or type(N)!=type(1) or type(tolerance)!=type(0.0):
-        print('unity_realtrace_test, Err1')
-        return -1
-    if np.shape(input_array)!=(N,N):
-        print('unity_realtrace_test, Err2')
-        return -1
-    if input_array.dtype!=np.empty((1,1),dtype=complex).dtype:
-        print('unity_realtrace_test, Err3')
-        return -1
-
-    trace = 0.0
-    for i in range(N):
-        trace = trace + input_array[i,i].real
-    if abs(trace-1.0)>tolerance:
-        return False
-    return True
-    
-    
-    
+from mathematical_tests import hermiticity_test, unity_realtrace_test
     
 def test_every_density_matrix(density_matrices, N, tolerance):
     '''This function takes:
     - density_matrices: (tridimensional real numpy array) Collection of density matrices which are formatted
     as they are returned from reformat_density_matrices(), i.e. it is a tridimensional numpy array which 
-    represents a collection of real arrays (Nx2N). 
+    represents a collection of real arrays (Nx2N). Iterating through the first index gives different density
+    matrices.
     - N: (integer) Dimension of the Hilbert space.
     - tolerance: (real array) It is passed to unity_realtrace_test as tolerance.
     
@@ -100,22 +36,24 @@ def test_every_density_matrix(density_matrices, N, tolerance):
     aux = np.empty((np.shape(density_matrices)[1],np.shape(density_matrices)[2]), dtype=complex)
     overall_result = True
     for k in range(number_of_matrices):
-        aux = realArray_to_complexArray(density_matrices[k,:,:],N)
+        aux = realArray_to_complexArray(density_matrices[k,:,:], N)
         if hermiticity_test(aux, N)==False or unity_realtrace_test(aux, N, tolerance)==False:
             patological_cases.append(k)
             overall_result = False
     return overall_result, np.array(patological_cases)
     
-    
-    
-    
-def test_every_matrix_file(filepaths, N, rows, cols, tolerance, skipped_rows=0):
+def test_every_matrix_file(filepaths, N, rows, cols, tolerance, separator='\t', skipped_rows=0):
     '''This function takes:
-    - filepaths:  (list of strings) Each of such strings is the path to a file which contains a set of density 
-    matrices as they are read by reformat_density_matrices().
+    - filepaths: (list of strings) Each one of such strings is the path to a file which contains 
+    a set of density matrices which should be formatted as they are read by reformat_density_matrices(),
+    i.e. one density matrix per row of the data file.
     - N: (integer) Dimension of the Hilbert. It is given to file_to_numpyarray_test() as N. 
-    - rows (resp. cols): (integer) It is given to reformat_density_matrices() as rows (columns). 
-    - tolerance: (real scalar) It is given to test_every_density_matrix() as tolerance.
+    For more info. on this paramter, check reformat_density_matrices() documentation.
+    - rows (resp. cols): (integer) Number of rows (resp. cols) of the unfolded density matrix.
+    It is given to reformat_density_matrices() as rows (columns). For more info. on this paramter,
+    check reformat_density_matrices() documentation.
+    - tolerance: (real scalar) It is given to test_every_density_matrix() as tolerance. This parameter
+    is eventually used to check that the trace of the density matrix is equal to 1 within some tolerance.
     
     This function applies test_every_density_matrix() to each density matrices collection (they are stored in each
     file whose path is contained in filepaths) and displays the results of each test.'''
@@ -129,13 +67,13 @@ def test_every_matrix_file(filepaths, N, rows, cols, tolerance, skipped_rows=0):
 
     result = True
     for i in range(len(filepaths)):
-        print('Now testing ', filepaths[i])
-        aux_array = file_to_numpyarray_test(filepaths[i],N,rows_to_skip=skipped_rows)
-        print('Testing '+str(np.shape(aux_array)[0])+' matrices')
+        print('Testing density matrices within: ', filepaths[i])
+        aux_array = file_to_numpyarray_test(filepaths[i], N, separator=separator, rows_to_skip=skipped_rows)
+        print('\t -> Testing '+str(np.shape(aux_array)[0])+' matrices')
         aux_array = reformat_density_matrices(aux_array, rows, cols)
         aux_result, _ = test_every_density_matrix(aux_array, rows, tolerance)
         if aux_result == False:
-            print('Test failed')
+            print('\t -> Test failed')
             return False
-        print('Test passed')
+        print('\t -> Test passed')
     return True   

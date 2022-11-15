@@ -2,9 +2,6 @@ import numpy as np
 import copy
 from test_read_and_format import file_to_numpyarray_test, reformat_density_matrices, realArray_to_complexArray
 
-
-
-
 def every_matrix_real_to_complex(density_matrices, N):
     '''This function takes:
     - density_matrices: (tridimensional numpy array) A set of density matrices as returned by 
@@ -25,14 +22,8 @@ def every_matrix_real_to_complex(density_matrices, N):
         output_array[k,:,:] = realArray_to_complexArray(density_matrices[k,:,:],N)
     return output_array
     
-    
-    
-    
 def commuter(a, b):
     return b, a
-    
-    
-    
  
 def partial_transpose(sqc_matrix, N, transpose_first_subsystem=True):
     '''This function takes:
@@ -66,9 +57,6 @@ def partial_transpose(sqc_matrix, N, transpose_first_subsystem=True):
         sqc_matrix[2,3], sqc_matrix[3,2] = commuter(sqc_matrix[2,3], sqc_matrix[3,2])
     return sqc_matrix
     
-    
-    
-    
 def negativity(hermitian_matrix, N, transpose_first=True):
     '''This function takes:
     - hermitian_matrix: (bidimensional square complex array) The matrix representation of an hermitian operator. 
@@ -94,10 +82,7 @@ def negativity(hermitian_matrix, N, transpose_first=True):
         if eigenvalues[i]<0.0:
             negativity += np.abs(eigenvalues[i])
     return negativity
-    
-    
-    
-    
+   
 def negativity_of_every_density_matrix(density_matrices, N, tolerance, transpose_first_subsystem=True):
     '''This function takes a tridimensional array of density matrices which are formatted
     as they are returned from every_matrix_real_to_complex(), i.e. it is a tridimensional numpy
@@ -131,14 +116,11 @@ def negativity_of_every_density_matrix(density_matrices, N, tolerance, transpose
         negativities[k] = aux_negativity
     return negativities
     
-    
-    
-    
-def calculate_negativity_distribution(filepath, N, tolerance, transpose_first_subsystem=True, skipped_rows=0):
+def calculate_negativity_distribution(filepath, N, tolerance, separator='\t', transpose_first_subsystem=True, skipped_rows=0):
     '''This function takes:
-    - filepath: (string) path to a file which contains the density matrices formatted as required
-    by file_to_numpyarraytest(). 
-    - N: (integer) Dimension of the tensor product space
+    - filepath: (string) path to a file which contains the density matrices formatted as required 
+    by file_to_numpyarray_test(), i.e. one density matrix per row.
+    - N: (integer) Dimension of the tensor product space.
     - transpose_first_subsystem: (boolean) Determines whether the transposition is performed over the first or 
     the second subsystem. 
     
@@ -152,14 +134,11 @@ def calculate_negativity_distribution(filepath, N, tolerance, transpose_first_su
     if type(filepath)!=type('') or type(N)!=type(1) or type(transpose_first_subsystem)!=type(True):
         print('calculate_negativity_distribution(), Err1')
     
-    density_matrices = reformat_density_matrices(file_to_numpyarray_test(filepath, N, rows_to_skip=skipped_rows))
+    density_matrices = reformat_density_matrices(file_to_numpyarray_test(filepath, N, separator=separator, rows_to_skip=skipped_rows))
     density_matrices = every_matrix_real_to_complex(density_matrices, N)
     negativities = negativity_of_every_density_matrix(density_matrices, N, tolerance, transpose_first_subsystem=True)
     
     return np.average(negativities), np.std(negativities), negativities
-
-
-
 
 def trace(N, DM):
     '''This function takes:
@@ -175,9 +154,6 @@ def trace(N, DM):
     for i in range(N):
         trace += DM[i,i]
     return trace
-
-
-
 
 def purity(N, DM):
     '''This function takes:

@@ -183,7 +183,7 @@ def generate_M_random_DMs_file(N, M, filepath, rng, pure=True, L_min=2, L_max=10
         negativities = np.array(negativities)
         negativity_mean = np.mean(negativities); negativity_std = np.std(negativities)
         prepend_whatever_distribution(filepath, negativity_mean, negativity_std, 'negativity')
-        return negativity_mean, negativity_stdgenerate_M_random
+        return negativity_mean, negativity_std
     else:
         Ls = []
         purities = []

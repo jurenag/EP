@@ -1,10 +1,7 @@
 import pandas as pd
 import numpy as np
 
-
-
-
-def file_to_numpyarray(filepath, N, label, take_redundancy, rows_to_skip=0):
+def file_to_numpyarray(filepath, N, label, take_redundancy, separator='\t', rows_to_skip=0):
     '''This function takes: 
     - filepath: (string) The path to a data file which must represent a (bidimensional) table of real numbers
     whose rows length is homogeneous. 
@@ -29,17 +26,18 @@ def file_to_numpyarray(filepath, N, label, take_redundancy, rows_to_skip=0):
     #the data file has one additional column whose entries are NaN. To prevent this from happening, we must specify 
     #usecols=range(2N*N), if take_redundancy==True, or usecols=useful_cols(N,True) otherwise
     if take_redundancy==True:
-        output_array = pd.read_table(filepath, sep='\t', header=None, index_col=None, usecols=range(2*N*N), skiprows=rows_to_skip)
+        output_array = pd.read_table(   filepath, sep=separator, 
+                                        header=None, index_col=None, 
+                                        usecols=range(2*N*N), skiprows=rows_to_skip)
     else:
-        output_array = pd.read_table(filepath, sep='\t', header=None, index_col=None, usecols=useful_cols(N,True), skiprows=rows_to_skip) 
+        output_array = pd.read_table(   filepath, sep=separator, header=None, 
+                                        index_col=None, usecols=useful_cols(N,True), 
+                                        skiprows=rows_to_skip) 
     output_array = np.array(output_array, dtype=float)
     number_of_matrices = np.shape(output_array)[0]
     label_column = label*np.ones((number_of_matrices,1),dtype=float)
     output_array = np.concatenate((output_array,label_column), axis=1)
     return output_array
-    
-    
-    
     
 def useful_cols(N, upper_half=True):
     '''This function takes:
@@ -88,9 +86,6 @@ def useful_cols(N, upper_half=True):
             cont = cont+1
     return result_list
     
-    
-    
-    
 def concatenate_entangled_and_separable_arrays(array1, array2, shuffle):
     '''This function takes:
     - array1 (resp. array2): (bidimensional numpy array) Both arrays must have the same number of columns. 
@@ -120,9 +115,6 @@ def concatenate_entangled_and_separable_arrays(array1, array2, shuffle):
         np.random.shuffle(concatenated_array)
     return concatenated_array
     
-    
-    
-    
 def split_array_train_test(array_to_split, fraction):
     '''This function takes:
     - array_to_split: (bidimensional numpy array)
@@ -148,9 +140,6 @@ def split_array_train_test(array_to_split, fraction):
     N = int(np.ceil(np.shape(array_to_split)[0]*fraction))
     split_arrays = np.split(array_to_split, (N,), 0)
     return split_arrays[0], split_arrays[1]
-    
-    
-    
     
 def split_array_input_label(array_to_split):
     '''This function takes:
