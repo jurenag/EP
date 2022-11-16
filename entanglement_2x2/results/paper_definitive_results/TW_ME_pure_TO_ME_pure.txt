@@ -1,0 +1,89 @@
+#Tensor product hilbert space dimension: 4; Number of simulations: 100;
+#Separable DMs were read from: /home/julio/Documents/entanglement_paper/updated_TFM_code/entanglement_2x2/input_data/received_from_DM/pure_states/separable.txt; Maximally entangled DMs were read from: /home/julio/Documents/entanglement_paper/updated_TFM_code/entanglement_2x2/input_data/received_from_DM/pure_states/entangled_1.txt;
+#Architecture of the MLP: [16, 8, 1]; Number of epochs: 40; Fraction of DMs used for training: 0.8;
+#Activation function in the hidden layers: relu; Activation function in the output layer: sigmoid; Loss function: binary_crossentropy;
+#Optimizer: rmsprop; Batch size: 40; Test tolerance: 0.5;
+#tf.Keras.callbacks.EarlyStopping was used with: metric:val_loss; Epochs patience:10; Minimum improvement:0.001;
+#Sucess rate averaged over every simulation and over every sample in the test set: 100.0%
+#Sample standard deviation for averaged success rate: 0.0%
+#
+#     Further info on simulation parameters:
+#
+#       N=4;                                    #Tensor product hilbert space dimension 
+#       howManyTimes = 100;                     #The simulation is launched howManyTimes times and the result is averaged over all of them
+#       architecture = [16,8,1];                #Number of layers and number of neurons in each layer 
+#       nepochs = 40;                           #Number of epochs to train the network   
+#       fraction = 0.8;                         #Fraction of density matrices used to train the NN      
+#       actHL = 'relu';                         #Activation function in the hidden layers
+#       lastAct = 'sigmoid';                    #Activation function in the output layer
+#       loss_f = 'binary_crossentropy'          #Loss function
+#       batch_size = 40;                        #Batch size
+#       take_redundancy = False
+#       output_file = cwd + '/results/paper_definitive_results/TW_ME_pure_TO_ME_pure.txt'
+#       opt = 'rmsprop'                         #Learning algorithm optimizer
+#       take_supplementary_tests = False        #Whether to test the (already) trained networks over additional datasets
+#       tol = 0.5                               #Tolerance
+#       study_val_loss = True                   #Whether to get the evolution of the loss function over the validation data.
+#       early_stopping = True                   #Whether to make use of the keras callback EarlyStopping.
+#       skipped_rows = (0, 0)
+#       pre_shuffle = True                      #Whether to shuffle or not the datasets before training.
+#       first_type = 'Separable'                #String referring to the type of quantum states in the first dataset.
+#       second_type= 'Maximally entangled'      #ÍDEM, second dataset.
+#       metric = 'val_loss'                     #Metric monitored by EarlyStopping.
+#       epochs_to_wait = 10                     #Patience given to EarlyStopping.
+#       min_delta = 1e-3                        #Minimum variation to assess whether the network continues to make improvements in its training.
+#
+#       loss, loss_std, ASR, ASRSTD, ASR2, ASRSTD2, \
+#       val_loss, val_loss_std, reached_this_epoch, \
+#       binaryOutput_formatData_trainNN_averageLoss_averageTestResults_and_writeResults( 
+#                       N, howManyTimes, 
+#                       separable_filepath, first_type, 
+#                       entangled_filepath, second_type, 
+#                       architecture, nepochs, 
+#                       fraction, 
+#                       actHL, lastAct, loss_f, 
+#                       batch_size, 
+#                       take_redundancy=take_redundancy, 
+#                       optimizer=opt, 
+#                       perform_additional_tests=take_supplementary_tests, 
+#                       first_test_filepath=additional_separable_filepaths, 
+#                       second_test_filepath=additional_entangled_filepaths, 
+#                       outFilePath = output_file, 
+#                       tolerance=tol, 
+#                       use_validation_data=study_val_loss, 
+#                       trigger_early_stopping=early_stopping, 
+#                       metric_to_monitor=metric, 
+#                       epochs_patience=epochs_to_wait, 
+#                       min_improvement=min_delta, 
+#                       monitor_mode='min', 
+#                       baseline=None, 
+#                       recover_best_configuration=True, 
+#                       first_label=0.0, 
+#                       second_label=1.0, 
+#                       shuffle=pre_shuffle, 
+#                       rts=skipped_rows, 
+#                       verb=0, 
+#                       snitch_every=1)
+#
+#       reached_this_epoch=[100 100 100 100 100 100 100 100 100 100 100 100 100  96  52  21  14   5 1]
+#
+#Epoch	Loss	Loss sample STD	Val. Loss	V.L. sample STD
+1	0.572799	0.002924	0.393461	0.006255
+2	0.204463	0.006309	0.077265	0.004966
+3	0.032948	0.002781	0.011547	0.001411
+4	0.005238	0.000773	0.002236	0.000398
+5	0.001078	0.000210	0.000542	0.000115
+6	0.000268	0.000058	0.000152	0.000035
+7	0.000077	0.000019	0.000048	0.000012
+8	0.000025	0.000007	0.000019	0.000006
+9	0.000010	0.000003	0.000007	0.000003
+10	0.000004	0.000002	0.000004	0.000002
+11	0.000002	0.000001	0.000003	0.000002
+12	0.000001	0.000001	0.000003	0.000002
+13	0.000001	0.000001	0.000002	0.000002
+14	0.000001	0.000001	0.000002	0.000002
+15	0.000001	0.000001	0.000003	0.000002
+16	0.000002	0.000002	0.000011	0.000010
+17	0.000003	0.000003	0.000009	0.000009
+18	0.000000	0.000000	0.000000	0.000000
+19	0.000000	0.000000	0.000000	0.000000
