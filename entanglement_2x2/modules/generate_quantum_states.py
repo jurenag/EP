@@ -21,13 +21,15 @@ def random_int(min, max, rng):
     
     
     
-def generate_random_pure_density_matrix(N, rng):
+def generate_random_pure_density_matrix(N, rng, julio_like=True, verbose=False):
     '''This function takes:
     - N: (integer) Dimension of the hilbert space whose states we want to sample. For example, for the case of 
     the tensor product space H_a otimes H_b, where H_a refers to the Hilbert space of to one qu-a-it 
     (for example, H_2 (H_3) for the qubit (qutrit)), the dimension of H_a otimes H_b is a*b=N. In that case, a 
     density matrix (=DM) (pure or mixed) is a NxN matrix actuating over H_a otimes H_b. 
     - rng: (a random generator, as initialized by rng = Generator(PCG64(int(seed))). Here, seed is some integer.
+    - julio_like: (Boolean scalar) If True (resp. False), generate the pure random density matrix as Julio 
+    (resp. Antonio) did.
     
     This function returns a random pure quantum state (i.e. a NxN square complex numpy array) 
     which belongs to the Hilbert space of dimension N. The state is generated according to the
@@ -42,27 +44,41 @@ def generate_random_pure_density_matrix(N, rng):
     the integer passed to Generator() as seed is time.time(), since I expect to call this function multiple times 
     within the same second. That would result in constantly initializing rng with the same seed and hence, 
     sampling the same density matrices a lot of times (strong correlations in the DMs sample set).'''
-    
-    modules = rng.random((N,))
-    phases = rng.random((N,))
-    #rng.random() returns a random number in (0,1). In order to get one random number in (0,2\pi) we must multiply
-    #rng.random() by 2\pi. The scipy library implements scientific constants. Namely, scipy.constants.pi gives \pi.
-    phases = 2*sp.pi*phases
-    #Initializing density_matrix as complex is essential
+
     density_matrix = np.empty((N,N), dtype=complex)
-    for i in range(N):
-        for k in range(N):
-            density_matrix[i,k] = modules[i]*modules[k]*np.exp(1.j*(phases[i]-phases[k]))
-    #Compute density_matrix normalization
-    norm = 0.0
-    for i in range(N):
-        norm += np.power(modules[i], 2)
-    return density_matrix/norm
+    if julio_like:
+        if verbose:
+            print("Generating Julio-like DM")
+        modules = rng.random((N,))
+        phases = rng.random((N,))
+        #rng.random() returns a random number in (0,1). In order to get one random number in (0,2\pi) we must multiply
+        #rng.random() by 2\pi. The scipy library implements scientific constants. Namely, scipy.constants.pi gives \pi.
+        phases = 2*sp.pi*phases
+        #Initializing density_matrix as complex is essential
+        for i in range(N):
+            for k in range(N):
+                density_matrix[i,k] = modules[i]*modules[k]*np.exp(1.j*(phases[i]-phases[k]))
+        #Compute density_matrix normalization
+        norm = 0.0
+        for i in range(N):
+            norm += np.power(modules[i], 2)
+        density_matrix *= 1./norm
+    else:
+        if verbose:
+            print("Generating Antonio-like DM")
+        column_real  = np.random.normal(0., 1., size=(N, 1))
+        column_imag  = np.random.normal(0., 1., size=(N, 1))
+        column       = np.zeros((N,1), dtype=complex)
+        column       = column_real + 1j*column_imag
+        column      *= 1./np.linalg.norm(column, 2)
+        density_matrix = np.matmul(column, np.transpose(np.conjugate(column)))
+    return density_matrix
+
     
 
 
 
-def generate_random_mixed_density_matrix(N, L, rng):
+def generate_random_mixed_density_matrix(N, L, rng, julio_like=True):
     '''This function takes:
     - N: (integer) The dimension of the hilbert space to which the returned density matrix belongs.
     - L: (integer) Number of elements in the convex linear combination.
@@ -77,7 +93,7 @@ def generate_random_mixed_density_matrix(N, L, rng):
     #Normalize coefficients
     coefficients = coefficients/np.sum(coefficients)
     for i in range(L):
-        aux = generate_random_pure_density_matrix(N, rng)
+        aux = generate_random_pure_density_matrix(N, rng, julio_like=julio_like)
         DM_holder[:,:] = DM_holder[:,:] + coefficients[i]*aux[:,:]
     return DM_holder
 
@@ -136,7 +152,7 @@ def write_DM_to_file(output_file, DM, N, preflattening_needed=True):
     
     
     
-def generate_M_random_DMs_file(N, M, filepath, rng, pure=True, L_min=2, L_max=10):
+def generate_M_random_DMs_file(N, M, filepath, rng, julio_like=True, pure=True, L_min=2, L_max=10):
     '''This function takes:
     - N: (integer) Dimension of the hilbert space whose states we want to sample.
     - M: (integer) The number of pure random density matrices (belonging to such space) that are going to be 
@@ -176,7 +192,7 @@ def generate_M_random_DMs_file(N, M, filepath, rng, pure=True, L_min=2, L_max=10
     if pure==True:
         output_file.write('#This file contains '+str(M)+' random pure density matrices\n')
         for i in range(M):
-            dm_holder = generate_random_pure_density_matrix(N, rng)
+            dm_holder = generate_random_pure_density_matrix(N, rng, julio_like=julio_like)
             write_DM_to_file(output_file, dm_holder, N, preflattening_needed=True)
             negativities.append(negativity(dm_holder,  N))
         output_file.close()
@@ -317,7 +333,7 @@ def write_headers_mixed(output_file, M, N, neg_subinterval_tuple, L_min, L_max):
     
     
     
-def generate_random_DMs_files_negativitywise(neg_resolution, M, N, filepath_root, rng, max_neg = 0.5, transpose_first_subsystem=True, pure=True, L_min=2, L_max=10):
+def generate_random_DMs_files_negativitywise(neg_resolution, M, N, filepath_root, rng, julio_like=True, max_neg = 0.5, transpose_first_subsystem=True, pure=True, L_min=2, L_max=10):
     '''This function takes:
     - neg_resolution: (real scalar) Step taken to discretize the negativity interval [0,max_neg=0.5] into intervals.
     - M: (integer) Number of DMs to generate within each negativity interval.
@@ -399,7 +415,7 @@ def generate_random_DMs_files_negativitywise(neg_resolution, M, N, filepath_root
     negativity_std = np.empty((howManySubintervals,), dtype=float)
     if pure==True:
         while np.prod(files_are_full)!=1:
-            DM_holder = generate_random_pure_density_matrix(N, rng)  
+            DM_holder = generate_random_pure_density_matrix(N, rng, julio_like=julio_like)  
             negativity_holder = negativity(DM_holder, N, transpose_first=transpose_first_subsystem)
             index_holder = belonging_subinterval_index(neg_part, negativity_holder, howManySubintervals)
             #Condtional statement not to keep writing DMs to those output files where we have already reached
