@@ -103,7 +103,7 @@ def ASR_grouped_bar_chart(filepath, bar_width, inbetweenwidth=None, separator='\
     - title: (string) Title that is shown above the plot.
     '''
 
-    data_holder = pd.read_table(filepath, sep='\t', header=0, index_col=0)
+    data_holder = pd.read_table(filepath, sep=separator, header=0, index_col=0)
 
     #Assuming the labels are the first column of the data file
     labels = data_holder.columns
