@@ -197,11 +197,11 @@ def first_null_position(array):
     return -1    
 
 def binaryOutput_formatData_trainNN_averageLoss_averageTestResults_and_writeResults(N, howManyTimes, first_filepath, \
-first_type, second_filepath, second_type, architecture, max_nepochs, fraction, actHL, actLast, loss_f, BS, optimizer='rmsprop', \
-perform_additional_tests=False, first_test_filepath=None, second_test_filepath=None, outFilePath=None, tolerance=1e-4, \
-use_validation_data=False, trigger_early_stopping=False, metric_to_monitor=None, epochs_patience=10, min_improvement=1e-3, \
-monitor_mode='min', baseline=None, recover_best_configuration=True, first_label=0.0, second_label=1.0, shuffle=True, rts=None, \
-verb=0, snitch_every=1):
+first_type, second_filepath, second_type, architecture, max_nepochs, fraction, actHL, actLast, loss_f, BS, separator='\t', \
+optimizer='rmsprop', perform_additional_tests=False, first_test_filepath=None, second_test_filepath=None, outFilePath=None, \
+tolerance=1e-4, use_validation_data=False, trigger_early_stopping=False, metric_to_monitor=None, epochs_patience=10, \
+min_improvement=1e-3, monitor_mode='min', baseline=None, recover_best_configuration=True, first_label=0.0, second_label=1.0, \
+shuffle=True, rts=None, verb=0, snitch_every=1):
     '''The COMPULSORY PARAMETERS that this function takes are:
     - N: (integer) Dimension of the total hilbert space associated to the studied quantum system. For the
     case of three qubits, such dimension is 2x2x2=8.
@@ -226,6 +226,8 @@ verb=0, snitch_every=1):
     second_type='bipartitely entangled'.
     
     The OPTIONAL PARAMETERS that this function takes are:
+    - separator: (string) It is given to file_to_numpyarray as separator. This string is eventually given to 
+    the datafile-parsing tool. This string is used to separate entries that are adjacent within the datafile.
     - optimizer: (string referring to a tf.keras.optimizers object) It is set to 'rmsprop' by default. See more options in
     keras documentation.
     - perform_additional_tests: (boolean) Whether to perform additional tests over the trained networks. It is set to
@@ -324,12 +326,18 @@ verb=0, snitch_every=1):
         return -1
 
     #Craft the train and the test data sets out of the input files.
-    first_array = file_to_numpyarray(first_filepath, N, first_label, rows_to_skip=rts[0])
+    first_array = file_to_numpyarray(   first_filepath, N, 
+                                        first_label, 
+                                        separator=separator,
+                                        rows_to_skip=rts[0])
     #WARNING: Since in this case (2x2x2) we are working with vector states, file_to_numpyarray()
     #takes 2*N real entries. In the case of two qubits (2x2), we worked with density matrices, 
     #and file_to_numpyarray() took 2*N*N real entries, where N is still the hilbert space dimension
     #N=4 in this case.
-    second_array = file_to_numpyarray(second_filepath, N, second_label, rows_to_skip=rts[1])
+    second_array = file_to_numpyarray(  second_filepath, N, 
+                                        second_label, 
+                                        separator=separator,
+                                        rows_to_skip=rts[1])
     whole_array = concatenate_entangled_and_separable_arrays(first_array, second_array, shuffle)
     train_array, test_array = split_array_train_test(whole_array, fraction)
     x_train, y_train, input_shape = split_array_input_label(train_array)
@@ -339,8 +347,14 @@ verb=0, snitch_every=1):
     x_test_2 = []
     y_test_2 = []
     for i in range(len(first_test_filepath)):
-        first_array = file_to_numpyarray(first_test_filepath[i], N, first_label, rows_to_skip=rts[2*(i+1)])
-        second_array = file_to_numpyarray(second_test_filepath[i], N, second_label, rows_to_skip=rts[(2*(i+1))+1])
+        first_array = file_to_numpyarray(   first_test_filepath[i], N, 
+                                            first_label, 
+                                            separator=separator,
+                                            rows_to_skip=rts[2*(i+1)])
+        second_array = file_to_numpyarray(  second_test_filepath[i], N, 
+                                            second_label, 
+                                            separator=separator,
+                                            rows_to_skip=rts[(2*(i+1))+1])
         whole_array = concatenate_entangled_and_separable_arrays(first_array, second_array, shuffle)
         aux_x, aux_y, _ = split_array_input_label(whole_array)
         x_test_2.append(aux_x)
