@@ -1,10 +1,7 @@
 import pandas as pd
 import numpy as np
 
-
-
-
-def file_to_numpyarray(filepath, N, label, rows_to_skip=0):
+def file_to_numpyarray(filepath, N, label, separator="\t", rows_to_skip=0):
     '''This function takes: 
     - filepath: (string) The path to a data file which must represent a (bidimensional) table of real numbers
     whose rows length is homogeneous. 
@@ -27,7 +24,9 @@ def file_to_numpyarray(filepath, N, label, rows_to_skip=0):
     #Just in case the data files provided contain one tabulator at the end of each row, pd.read_table() would think that 
     #the data file has one additional column whose entries are NaN. To prevent this from happening, we must specify 
     #usecols=range(2*N).
-    output_array = pd.read_table(filepath, sep='\t', header=None, index_col=None, usecols=range(2*N), skiprows=rows_to_skip) 
+    output_array = pd.read_table(   filepath, sep=separator, header=None, 
+                                    index_col=None, usecols=range(2*N), 
+                                    skiprows=rows_to_skip) 
     output_array = np.array(output_array, dtype=float)
     number_of_states = np.shape(output_array)[0]
     label_column = label*np.ones((number_of_states,1),dtype=float)
