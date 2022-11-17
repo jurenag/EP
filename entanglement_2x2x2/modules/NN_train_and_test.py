@@ -119,8 +119,8 @@ def save_results(filepath, loss, standard_deviation, ASR, ASRSTD, additional_tes
     output_file.write('#Sucess rate averaged over every simulation and over every sample in the test set: '+str(ASR*100)+'%\n')
     output_file.write('#Sample standard deviation for averaged success rate: '+str(ASRSTD*100)+'%\n')
     if additional_tests_taken == True:
-        output_file.write('#Same average success rate for supplementary tests: '+str(ASR2)+'%\n')
-        output_file.write('#Sample STD for averaged success rate in supplementary tests: '+str(ASRSTD2)+'%\n')
+        output_file.write('#Same average success rate for supplementary tests: '+str(ASR2*100)+'%\n')
+        output_file.write('#Sample STD for averaged success rate in supplementary tests: '+str(ASRSTD2*100)+'%\n')
 
     if use_val_data == True:
         output_file.write('#Epoch\tLoss\tLoss sample STD\tVal. Loss\tV.L. sample STD\n')
@@ -509,6 +509,8 @@ shuffle=True, rts=None, verb=0, snitch_every=1):
         # performed not even once. 
         aux = np.sqrt((np.mean(np.power(test_results_2[i,:], 2))-np.power(np.mean(test_results_2[i,:]), 2))/howManyTestSamples2)
         average_success_rate_std_2.append(aux)
+    average_success_rate_2 = np.array(average_success_rate_2)
+    average_success_rate_std_2 = np.array(average_success_rate_std_2)
 
     if use_validation_data == True:  
         if outFilePath!=None:  
