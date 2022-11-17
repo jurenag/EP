@@ -362,7 +362,7 @@ shuffle=True, rts=None, verb=0, snitch_every=1):
 
     loss_history = np.zeros((max_nepochs,),dtype=float)
     loss_history_squared = np.zeros((max_nepochs,),dtype=float)
-    test_results = np.zeros((np.shape(y_test)[0],))
+    test_results = np.zeros((howManyTimes,))
 
     # The following unidimensional array counts how many simulations reached a certain epoch. For example, if
     # every simulation reached the 22-nd epoch, then reached_this_epoch[21]=howManyTimes        
@@ -385,7 +385,7 @@ shuffle=True, rts=None, verb=0, snitch_every=1):
     if first_test_filepath==[]:
         test_results_2 = np.array([])
     else:
-        test_results_2 = np.zeros((len(first_test_filepath), np.shape(y_test_2[0])[0],))
+        test_results_2 = np.zeros((len(first_test_filepath), howManyTimes))
 
     if use_validation_data==True:
         val_loss_history = np.zeros((max_nepochs,),dtype=float)
@@ -418,9 +418,9 @@ shuffle=True, rts=None, verb=0, snitch_every=1):
             val_loss_history_squared += np.power(aux_3, 2)
 
             # Test the trained network
-            test_results = test_results + multiple_test(model, x_test, y_test, tolerance)
+            test_results[i] = np.mean(multiple_test(model, x_test, y_test, tolerance))
             for j in range(len(first_test_filepath)):
-                test_results_2[j,:] = test_results_2[j,:] + multiple_test(model, x_test_2[j], y_test_2[j], tolerance)            
+                test_results_2[j,i] = np.mean(multiple_test(model, x_test_2[j], y_test_2[j], tolerance))
           
             # Verbose
             if i%snitch_every==0:
@@ -450,9 +450,9 @@ shuffle=True, rts=None, verb=0, snitch_every=1):
             loss_history_squared += np.power(aux_2, 2)
 
             # Test the trained network
-            test_results = test_results + multiple_test(model, x_test, y_test, tolerance)
+            test_results[i] = np.mean(multiple_test(model, x_test, y_test, tolerance))
             for j in range(len(first_test_filepath)):
-                test_results_2[j,:] = test_results_2[j,:] + multiple_test(model, x_test_2[j], y_test_2[j], tolerance)            
+                test_results_2[j,i] = np.mean(multiple_test(model, x_test_2[j], y_test_2[j], tolerance))
           
             # Verbose
             if i%snitch_every==0:
@@ -484,30 +484,27 @@ shuffle=True, rts=None, verb=0, snitch_every=1):
         val_loss_history_squared = val_loss_history_squared/reached_this_epoch
         val_loss_std = np.sqrt((val_loss_history_squared-np.power(val_loss_history,2))/reached_this_epoch)
 
-    # Tests are always performed regardless early stopping, therefore they should be normalized to HowManyTimes.
-    test_results = test_results/howManyTimes
-    howManyTestSamples = np.shape(test_results)[0]
-    test_results_2 = test_results_2/howManyTimes
-
-    if first_test_filepath==[]:
-        howManyTestSamples2 = 0
-    else:
-        # WARNING2: Here, we are making the same assumption as in WARNING1!
-        howManyTestSamples2 = np.shape(test_results_2)[1]
-
     average_success_rate = np.mean(test_results)
-    # (*ref) In these cases, if I consider the elementary random variable to be the mean of the result of a multiple tests over the same
-    # single input sample (i.e. 1+0+0+1+1+0+0+1+1+0/howManyTimes, where 1 means correct labeling of the ANN and 0 means incorrect labeling),
-    # then I'm summing over howManyTestSamples. Therefore, the std of the average success rate is the std of the success rate divided
-    # by sqrt(howManyTestSamples)
-    average_success_rate_std = np.sqrt((np.mean(np.power(test_results, 2))-np.power(np.mean(test_results), 2))/howManyTestSamples)
+    # (*ref) In these cases, if I consider the elementary random variable to be the mean of the result of 
+    # multiple tests over the SAME single input sample (i.e. 1+0+0+1+1+0+0+1+1+0/howManyTimes, where 1 
+    # means correct labeling of the ANN and 0 means incorrect labeling), then I'm summing over howManyTestSamples
+    # terms. In this case, the std of the average success rate would be the std of the success 
+    # rate divided by the square root of the number of test samples. However, note that this sample std can be 
+    # computed in such way when we got multiple independent realizations of the same elementary random variable.
+    # However, the variable here varies from sample to sample. Indeed, in this approach, the variable itself 
+    # comes fixed by the sample which the network is fed with. So, if we want to compute the sample variable 
+    # by using the square root of the number of realizations, we better consider as our random variable the 
+    # success rate averaged over the whole data set after one training. In this approach, the sample std is 
+    # computed as the std of the success rate divided by sqrt(howManyTimes). Note that the value of the 
+    # success rate itself is computed in the same way in both cases.
+    average_success_rate_std = np.sqrt((np.mean(np.power(test_results, 2))-np.power(np.mean(test_results), 2))/howManyTimes)
     average_success_rate_2 = []
     average_success_rate_std_2 = []
     for i in range(len(first_test_filepath)):
         average_success_rate_2.append(np.mean(test_results_2[i,:])) 
         # No need to worry about dividing by zero in the following line since, if separable_test_filepath==[], then the body of this loop is
         # performed not even once. 
-        aux = np.sqrt((np.mean(np.power(test_results_2[i,:], 2))-np.power(np.mean(test_results_2[i,:]), 2))/howManyTestSamples2)
+        aux = np.sqrt((np.mean(np.power(test_results_2[i,:], 2))-np.power(np.mean(test_results_2[i,:]), 2))/howManyTimes)
         average_success_rate_std_2.append(aux)
     average_success_rate_2 = np.array(average_success_rate_2)
     average_success_rate_std_2 = np.array(average_success_rate_std_2)
