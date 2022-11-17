@@ -1,3 +1,4 @@
 *.pyc
 entanglement_2x2/.ipynb_checkpoints/*
 entanglement_2x2/format_and_train-jvsc-327201a9-1bf5-4508-839d-5470932f407e772e77cc-20eb-41c7-b5fc-41c4aa9e4994.ipynb
+*.ipynb
