@@ -7,7 +7,7 @@
 #Sucess rate averaged over every simulation and over every sample in the test set: 100.0%
 #Sample standard deviation for averaged success rate: 0.0%
 #
-#     Further info on simulation parameters:
+#       Further info on simulation parameters:
 #
 #       N=4;                                    #Tensor product hilbert space dimension 
 #       howManyTimes = 100;                     #The simulation is launched howManyTimes times and the result is averaged over all of them
