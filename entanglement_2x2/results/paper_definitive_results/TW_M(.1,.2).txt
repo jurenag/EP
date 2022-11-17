@@ -1,0 +1,153 @@
+#Tensor product hilbert space dimension: 4; Number of simulations: 10;
+#Mixed separable DMs were read from: /home/julio/Documents/entanglement_paper/updated_TFM_code/entanglement_2x2/input_data/received_from_DM/mixed_states/mixed_separable.txt; Mixed entangled states (Negativity in (.1, .2)) DMs were read from: /home/julio/Documents/entanglement_paper/updated_TFM_code/entanglement_2x2/input_data/generated/mixed_states/negativity_(0.1, 0.2).txt;
+#Architecture of the MLP: [16, 8, 1]; Number of epochs: 75; Fraction of DMs used for training: 0.8;
+#Activation function in the hidden layers: relu; Activation function in the output layer: sigmoid; Loss function: binary_crossentropy;
+#Optimizer: rmsprop; Batch size: 40; Test tolerance: 0.5;
+#tf.Keras.callbacks.EarlyStopping was used with: metric:val_loss; Epochs patience:25; Minimum improvement:0.001;
+#Sucess rate averaged over every simulation and over every sample in the test set: 99.715%
+#Sample standard deviation for averaged success rate: 0.022967368151177798%
+#Same average success rate for supplementary tests: [50.05   52.0405 72.3205 98.1285 99.9225 99.887  99.845  99.8675 99.9715 99.975 ]%
+#Sample STD for averaged success rate in supplementary tests: [0.01088577 0.2093352  0.81769751 0.17873731 0.01239456 0.00505964  0.01024695 0.01131923 0.00308626 0.00316228]%
+#
+#       Further info on simulation parameters
+# 
+#       N=4;                                 
+#       howManyTimes = 10;                   
+#       architecture = [16,8,1];             
+#       nepochs = 75;                        
+#       fraction = 0.8;                      
+#       actHL = 'relu';                      
+#       lastAct = 'sigmoid';                 
+#       loss_f = 'binary_crossentropy'       
+#       batch_size = 40;                     
+#       take_redundancy = False
+#       output_file = cwd + '/results/paper_definitive_results/TW_M(.1,.2).txt' 
+#       opt = 'rmsprop'                    
+#       take_supplementary_tests = True    
+#       tol = 0.5                          
+#       study_val_loss = True              
+#       early_stopping = True              
+#       skipped_rows = (    0, 5,          
+#                           0, 3, 0, 3, 0, 3, 0, 3, 0, 3,  
+#                           #0, 3, 0, 3, 0, 3, 0, 3, 0, 3, 
+#                           0, 5, 0, 5, 0, 5, 0, 5, 0, 5)  
+#       pre_shuffle = True                     
+#       first_type = 'Mixed separable'         
+#       second_type= 'Mixed entangled states (Negativity in (.1, .2))'   
+#       metric = 'val_loss'                  
+#       epochs_to_wait = 25                  
+#       min_delta = 1e-3                     
+#
+#       loss, loss_std, ASR, ASRSTD, ASR2, ASRSTD2, \
+#       val_loss, val_loss_std, reached_this_epoch, \
+#       longest_training = binaryOutput_formatData_trainNN_averageLoss_averageTestResults_and_writeResults( 
+#                       N, howManyTimes, 
+#                       separable_filepath, first_type, 
+#                       entangled_filepath, second_type, 
+#                       architecture, nepochs, 
+#                       fraction, 
+#                       actHL, lastAct, loss_f, 
+#                       batch_size, 
+#                       take_redundancy=take_redundancy, 
+#                       optimizer=opt, 
+#                       perform_additional_tests=take_supplementary_tests, 
+#                       first_test_filepath=additional_separable_filepaths, 
+#                       second_test_filepath=additional_entangled_filepaths, 
+#                       outFilePath = output_file, 
+#                       tolerance=tol, 
+#                       use_validation_data=study_val_loss, 
+#                       trigger_early_stopping=early_stopping, 
+#                       metric_to_monitor=metric, 
+#                       epochs_patience=epochs_to_wait, 
+#                       min_improvement=min_delta, 
+#                       monitor_mode='min', 
+#                       baseline=None, 
+#                       recover_best_configuration=True, 
+#                       first_label=0.0, 
+#                       second_label=1.0, 
+#                       shuffle=pre_shuffle, 
+#                       rts=skipped_rows, 
+#                       verb=0, 
+#                       snitch_every=1)
+#
+#       reached_this_epoch, longest_training = [10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10
+#                                               10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10 10  9  9
+#                                               9  9  9  9  8  8  8  8  7  6  6  6  5  5  5  5  5  4  3  3  3  3  2  2
+#                                               1  1  1], 75
+#
+#Epoch	Loss	Loss sample STD	Val. Loss	V.L. sample STD
+1	0.626549	0.006717	0.534206	0.010838
+2	0.397081	0.012039	0.290781	0.011343
+3	0.209743	0.010055	0.168991	0.010103
+4	0.125074	0.008971	0.105473	0.008593
+5	0.078810	0.006850	0.068161	0.006141
+6	0.052526	0.004582	0.047364	0.004222
+7	0.037979	0.003051	0.035777	0.002873
+8	0.029753	0.002191	0.029597	0.002211
+9	0.024682	0.001682	0.025514	0.002004
+10	0.021170	0.001441	0.022592	0.001532
+11	0.018634	0.001258	0.020326	0.001428
+12	0.016803	0.001179	0.018761	0.001314
+13	0.015267	0.001076	0.017719	0.001342
+14	0.014085	0.000983	0.017196	0.001473
+15	0.013146	0.000905	0.016368	0.001213
+16	0.012284	0.000862	0.015424	0.001061
+17	0.011739	0.000844	0.015313	0.001145
+18	0.011046	0.000799	0.015365	0.000825
+19	0.010558	0.000785	0.014760	0.000883
+20	0.010041	0.000778	0.014945	0.001066
+21	0.009646	0.000752	0.014030	0.001168
+22	0.009332	0.000753	0.013734	0.001111
+23	0.008900	0.000703	0.013278	0.000967
+24	0.008626	0.000721	0.013641	0.001013
+25	0.008460	0.000704	0.013110	0.000929
+26	0.008141	0.000737	0.013727	0.000956
+27	0.007933	0.000677	0.013013	0.000914
+28	0.007563	0.000690	0.013395	0.000905
+29	0.007336	0.000648	0.012995	0.000865
+30	0.007212	0.000650	0.013720	0.000947
+31	0.007065	0.000654	0.013025	0.000876
+32	0.006849	0.000653	0.012392	0.000912
+33	0.006697	0.000618	0.013133	0.000890
+34	0.006503	0.000613	0.013576	0.001043
+35	0.006302	0.000598	0.012422	0.000950
+36	0.006205	0.000607	0.012951	0.001052
+37	0.006116	0.000626	0.012800	0.000987
+38	0.005913	0.000584	0.013325	0.000933
+39	0.005857	0.000553	0.012989	0.000863
+40	0.005599	0.000557	0.012064	0.000805
+41	0.005565	0.000551	0.012348	0.000990
+42	0.005481	0.000563	0.012446	0.001031
+43	0.005332	0.000566	0.012839	0.000607
+44	0.005219	0.000517	0.012675	0.000638
+45	0.005163	0.000544	0.012202	0.000644
+46	0.004981	0.000535	0.012046	0.000653
+47	0.004924	0.000539	0.011781	0.000681
+48	0.004871	0.000538	0.012562	0.000866
+49	0.004800	0.000576	0.012402	0.000885
+50	0.004731	0.000565	0.012212	0.000548
+51	0.004682	0.000503	0.012046	0.000762
+52	0.004602	0.000573	0.012685	0.001078
+53	0.004783	0.000604	0.013134	0.000876
+54	0.004635	0.000593	0.012857	0.000760
+55	0.004582	0.000621	0.012864	0.000654
+56	0.004367	0.000526	0.012505	0.000690
+57	0.004594	0.000612	0.013747	0.000644
+58	0.004854	0.000712	0.012846	0.000997
+59	0.004733	0.000716	0.014221	0.000836
+60	0.004702	0.000697	0.014891	0.000840
+61	0.004808	0.000774	0.014163	0.001008
+62	0.004888	0.000819	0.013637	0.000728
+63	0.004805	0.000748	0.015208	0.001399
+64	0.004720	0.000765	0.014000	0.000748
+65	0.004549	0.000805	0.013398	0.000552
+66	0.004902	0.000803	0.014453	0.001737
+67	0.005333	0.000962	0.013970	0.000115
+68	0.005260	0.000872	0.013200	0.000508
+69	0.005068	0.000848	0.015287	0.001299
+70	0.005292	0.001102	0.014919	0.000954
+71	0.005674	0.001172	0.013878	0.000955
+72	0.005740	0.001163	0.015606	0.000448
+73	0.003813	0.000000	0.018976	0.000000
+74	0.003880	0.000000	0.014731	0.000000
+75	0.003641	0.000000	0.013442	0.000000
