@@ -14,7 +14,7 @@ def file_to_numpyarray(filepath, N, label, rows_to_skip=0):
     row.
     - label: (integer) It is appended as the last element of each row of the output array.
     
-    The function takes such table and transform it into a numpy array whose entries type is float. It appends one
+    The function takes such table and transforms it into a numpy array whose entries type is float. It appends one
     more scalar entry (label) as the last column of every row. The function returns the resulting array.'''
     
     if type(filepath)!=type('') or type(N)!=type(1) or type(label)!=type(1.0):
@@ -33,9 +33,6 @@ def file_to_numpyarray(filepath, N, label, rows_to_skip=0):
     label_column = label*np.ones((number_of_states,1),dtype=float)
     output_array = np.concatenate((output_array,label_column), axis=1)
     return output_array
-    
-    
-    
     
 def concatenate_entangled_and_separable_arrays(array1, array2, shuffle):
     '''This function takes:
@@ -66,9 +63,6 @@ def concatenate_entangled_and_separable_arrays(array1, array2, shuffle):
         np.random.shuffle(concatenated_array)
     return concatenated_array
     
-    
-    
-    
 def split_array_train_test(array_to_split, fraction):
     '''This function takes:
     - array_to_split: (bidimensional numpy array)
@@ -94,10 +88,7 @@ def split_array_train_test(array_to_split, fraction):
     N = int(np.ceil(np.shape(array_to_split)[0]*fraction))
     split_arrays = np.split(array_to_split, (N,), 0)
     return split_arrays[0], split_arrays[1]
-    
-    
-    
-    
+
 def split_array_input_label(array_to_split):
     '''This function takes:
     - array_to_split: (bidimensional numpy array) Must have more than one column.

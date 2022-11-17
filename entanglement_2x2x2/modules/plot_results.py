@@ -3,9 +3,6 @@ import pandas as pd
 import matplotlib
 from matplotlib import pyplot as plt
 
-
-
-
 def none_unidimensional_np_array(length):
     '''This function takes:
     - length: (integer) Number of entries in the resulting array.
@@ -16,9 +13,6 @@ def none_unidimensional_np_array(length):
     for i in range(length):
         result.append(None)
     return np.array(result)
-
-
-
 
 def plot(filepaths, rows_to_skip, xycolumns=(0,1), stdColumn=None, plotStd=None, separator='\t', err_every=None, labels=None, showGrid=False, save_data=None, show_fig=True, xlim=None, ylim=None, xlabel=None, ylabel=None, labelsfontsize=12, ticksfontsize=16, legendncol=1, legendfontsize=16):
     '''This function takes:
@@ -88,8 +82,6 @@ def plot(filepaths, rows_to_skip, xycolumns=(0,1), stdColumn=None, plotStd=None,
         plt.show()
 
     return 
-
-
 
 def ASR_grouped_bar_chart(filepath, bar_width, inbetweenwidth=None, separator='\t', ylim=None, legend_columns=None, showGrid=False, save_data=None, show_fig=True, ylabel=None, title=None, legendfontsize=12, xlabelfontsize=12, ylabelfontsize=12):
     '''This function takes:
@@ -164,4 +156,3 @@ def ASR_grouped_bar_chart(filepath, bar_width, inbetweenwidth=None, separator='\
         plt.show()
 
     return
-            

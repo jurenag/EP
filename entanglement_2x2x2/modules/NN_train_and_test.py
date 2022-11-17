@@ -5,9 +5,6 @@ from tensorflow import keras
 from tensorflow.keras import layers
 from NN_read_and_format import file_to_numpyarray, concatenate_entangled_and_separable_arrays, split_array_train_test, split_array_input_label
 
-
-
-
 def create_ANN(nn, actHL, actLast, loss_f, input_shape, opt='rmsprop'):
     '''This function takes:
     - nn: (list of integers) Must have 1 or more integers. They are the number of neurons in each hidden layer.
@@ -36,9 +33,6 @@ def create_ANN(nn, actHL, actLast, loss_f, input_shape, opt='rmsprop'):
     model.compile(optimizer=opt, loss=loss_f)
     return model
     
-    
-    
-  
 def train_ANN(model, x_train, y_train, nepochs, BS, verb, use_val_data = False, x_val=None, y_val=None):
     if type(x_train)!=type(np.array([])) or type(y_train)!=type(np.array([])) or type(nepochs)!=type(1) or type(BS)!=type(1) or type(verb)!=type(1):
         print('train_ANN(), Err1')
@@ -51,9 +45,6 @@ def train_ANN(model, x_train, y_train, nepochs, BS, verb, use_val_data = False, 
         return model.fit(x_train, y_train, batch_size=BS, epochs=nepochs, verbose=verb, validation_data=(x_val,y_val))
     else:
         return model.fit(x_train, y_train, batch_size=BS, epochs=nepochs, verbose=verb)
-    
-    
-    
     
 def elementary_test(true_value, predicted_value, tolerance):
     '''This function takes:
@@ -71,9 +62,6 @@ def elementary_test(true_value, predicted_value, tolerance):
         return 1
     else:
         return 0
-    
-    
-    
     
 def multiple_test(model, x_test, y_test, tolerance):
     '''This function takes:
@@ -103,9 +91,6 @@ def multiple_test(model, x_test, y_test, tolerance):
     for i in range(np.shape(y_test)[0]):
         result[i] = elementary_test(y_test[i,0],predictions_array[i,0],tolerance)
     return result
-    
-
-
     
 #ASR is for average success rate, and ASRSTD is for average success rate standard deviation
 def save_results(filepath, loss, standard_deviation, ASR, ASRSTD, additional_tests_taken=False, ASR2=None, ASRSTD2=None, use_val_data=False, val_loss=None, val_loss_std=None, openmode='a'):
@@ -149,9 +134,6 @@ def save_results(filepath, loss, standard_deviation, ASR, ASRSTD, additional_tes
     output_file.close()
     return
     
-    
-    
-    
 def write_headers(outFilePath, N, howManyTimes, first_filepath, first_type, second_filepath, second_type, architecture, nepochs, fraction, actHL, actLast, loss_f, BS, tolerance, optimizer, openmode='w'):
 	output_file = open(outFilePath, mode=openmode)
 	output_file.write('#Tensor product hilbert space dimension: '+str(N)+ '; Number of simulations: '+str(howManyTimes)+';\n')
@@ -161,9 +143,6 @@ def write_headers(outFilePath, N, howManyTimes, first_filepath, first_type, seco
 	output_file.write('#Optimizer: '+optimizer+'; Batch size: '+str(BS)+'; Test tolerance: '+str(tolerance)+';\n')
 	output_file.close()
 	return
-    
-    
-    
 
 def correct_array_length(array, desired_length, new_entries=0.0):
     '''This function takes:
@@ -199,9 +178,6 @@ def correct_array_length(array, desired_length, new_entries=0.0):
         array, _ = np.split(array, (desired_length,), axis=0)
         return array
 
-
-
-
 def first_null_position(array):
     '''This function takes:
     - array: (unidimensional numpy array of dtype==int) 
@@ -219,9 +195,6 @@ def first_null_position(array):
             return i
 
     return -1    
-
-
-
 
 def binaryOutput_formatData_trainNN_averageLoss_averageTestResults_and_writeResults(N, howManyTimes, first_filepath, \
 first_type, second_filepath, second_type, architecture, max_nepochs, fraction, actHL, actLast, loss_f, BS, optimizer='rmsprop', \
