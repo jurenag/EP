@@ -266,7 +266,7 @@ shuffle=True, rts=None, verb=0, snitch_every=1):
     the one that resulted in the best value for metric_to_monitor between all of the model updates during the last epochs_patience
     epochs.
     - monitor_mode: (string) It is passed to EarlyStopping as mode. It can take one of these values: \{'min', 'max', 'auto'\}.
-    It is set to 'min' by default. 'min' means that are improvements are made if there is a negative variation in metric_to_monitor
+    It is set to 'min' by default. 'min' means that improvements are made if there is a negative variation in metric_to_monitor
     that is greater than min_improvement in absolute value. 'max' means that the goal is to let metric_to_monitor increase. In
     'auto' mode, the mode is inferred.
     - baseline: (scalar) It is set to None by default. It is passed to EarlyStopping as baseline.
@@ -278,7 +278,7 @@ shuffle=True, rts=None, verb=0, snitch_every=1):
     - shuffle: (boolean) Determines whether the concatenation of the first and second type of vector states is 
     shuffled before being split into training set and test set. It is set to True by default. See 
     concatenate_entangled_and_separable_arrays() for more info. 
-    - rts: (tuple of 2+2*len(separable_test_filepath) integers) The integers in this tuple are given to 
+    - rts: (tuple of 2+2*len(first_test_filepath) integers) The integers in this tuple are given to 
     file_to_numpyarray as rows_to_skip. In this case, rts[0] (resp. rts[1]) are the rows to skip when reading 
     the file containing the first (resp. second) type of vector states used for the network training. rts[2] 
     (resp. rts[3]) are the rows to skip when reading the files that store the first (resp. second) type of vector
@@ -302,38 +302,38 @@ shuffle=True, rts=None, verb=0, snitch_every=1):
 
     if trigger_early_stopping == True and metric_to_monitor == 'val_loss':
         if use_validation_data == False:
-            print('Validation data must be used if trigger_early_stopping==True and metric_to_monitor=val_loss. Returning -1')
+            print('ERR0: Validation data must be used if trigger_early_stopping==True and metric_to_monitor=val_loss. Returning -1')
             return -1
 
-    #If separable_test_filepath is None or entangled_test_filepath is None, then no additional test will be performed.
+    # If first_test_filepath is None or second_test_filepath is None, then no additional test will be performed.
     if perform_additional_tests==False:
         first_test_filepath=[]
         second_test_filepath=[]
-    #Later on we perform loops for i in range(len(separable_test_filepath)). If separable_test_filepath was set to None,
-    #then such loop will be performed for i in range(len([])), i.e. for i in range(0), which is equivalent to no loop at all.
+    # Later on we perform loops for i in range(len(first_test_filepath)). If first_test_filepath was set to None,
+    # then such loop will be performed for i in range(len([])), i.e. for i in range(0), which is equivalent to no loop at all.
     else:
         if len(first_test_filepath)!=len(second_test_filepath):
-            print('Err, Returning -1.')
+            print('ERR1: Returning -1.')
             return -1
 
-    #Setting rts to None means skipping no lines in any input data file.
+    # Setting rts to None means skipping no lines in any input data file.
     if rts==None:
         rts = list(np.zeros(((2+(2*len(first_test_filepath))),), dtype=int))
 
-    #If rts was different to None, then it is not still ensured that it has the required length.
+    # If rts was different to None, then it is not still ensured that it has the required length.
     if len(rts)!= 2+(2*len(first_test_filepath)):
-        print('Not allowed length for rts. Returning -1.')
+        print('ERR2: Not allowed length for rts. Returning -1.')
         return -1
 
-    #Craft the train and the test data sets out of the input files.
+    # Craft the train and the test data sets out of the input files.
     first_array = file_to_numpyarray(   first_filepath, N, 
                                         first_label, 
                                         separator=separator,
                                         rows_to_skip=rts[0])
-    #WARNING: Since in this case (2x2x2) we are working with vector states, file_to_numpyarray()
-    #takes 2*N real entries. In the case of two qubits (2x2), we worked with density matrices, 
-    #and file_to_numpyarray() took 2*N*N real entries, where N is still the hilbert space dimension
-    #N=4 in this case.
+    # WARNING: Since in this case (2x2x2) we are working with vector states, file_to_numpyarray()
+    # takes 2*N real entries. In the case of two qubits (2x2), we worked with density matrices, 
+    # and file_to_numpyarray() took 2*N*N real entries, where N is still the hilbert space dimension
+    # N=4 in this case.
     second_array = file_to_numpyarray(  second_filepath, N, 
                                         second_label, 
                                         separator=separator,
@@ -343,7 +343,7 @@ shuffle=True, rts=None, verb=0, snitch_every=1):
     x_train, y_train, input_shape = split_array_input_label(train_array)
     x_test, y_test, _ = split_array_input_label(test_array)
 
-    #Craft and group the test data sets used for additional tests over the trained networks.
+    # Craft and group the test data sets used for additional tests over the trained networks.
     x_test_2 = []
     y_test_2 = []
     for i in range(len(first_test_filepath)):
@@ -360,24 +360,28 @@ shuffle=True, rts=None, verb=0, snitch_every=1):
         x_test_2.append(aux_x)
         y_test_2.append(aux_y)
 
-    #The following unidimensional array counts how many simulations reached a certain epoch. For example, if
-    #every simulation reached the 22-nd epoch, then reached_this_epoch[21]=howManyTimes
     loss_history = np.zeros((max_nepochs,),dtype=float)
     loss_history_squared = np.zeros((max_nepochs,),dtype=float)
     test_results = np.zeros((np.shape(y_test)[0],))
-        
+
+    # The following unidimensional array counts how many simulations reached a certain epoch. For example, if
+    # every simulation reached the 22-nd epoch, then reached_this_epoch[21]=howManyTimes        
     if trigger_early_stopping==True:
         reached_this_epoch = np.zeros((max_nepochs,), dtype=int)
-        my_callbacks = [tf.keras.callbacks.EarlyStopping(monitor=metric_to_monitor, min_delta=min_improvement, \
-        patience=epochs_patience, verbose=0, mode=monitor_mode, baseline=baseline, restore_best_weights=recover_best_configuration)]
+        my_callbacks = [tf.keras.callbacks.EarlyStopping(   monitor=metric_to_monitor, 
+                                                            min_delta=min_improvement,
+                                                            patience=epochs_patience, 
+                                                            verbose=0, mode=monitor_mode, 
+                                                            baseline=baseline, 
+                                                            restore_best_weights=recover_best_configuration)]
     else:
-        #In order to regularize further calculus, I generalize reached_this_epoch to the case of trigger_early_stopping==False
-        #just by setting every entry in reached_this_epoch to howManyTimes
-        reached_this_epoch = np.ones((max_nepochs,), dtype=int)
-        reached_this_epoch *= howManyTimes
+        # In order to regularize further calculus, I generalize reached_this_epoch to the case of trigger_early_stopping==False
+        # just by setting every entry in reached_this_epoch to howManyTimes
+        reached_this_epoch = howManyTimes*np.ones((max_nepochs,), dtype=int)
     
-    #Assuming the length of every array in y_test_2 is the same. Note that this assumption is not general. This will only work
-    #if the number of data inputs in each test file is the same.
+    # WARNING1: In the following lines we are assuming that thhe length of every array in y_test_2 is the same. 
+    # This assumption is not general and will only work if the number of data inputs in each test file is the same.
+    # At some point, this assumption needs to be dropped!!
     if first_test_filepath==[]:
         test_results_2 = np.array([])
     else:
@@ -389,12 +393,12 @@ shuffle=True, rts=None, verb=0, snitch_every=1):
         for i in range(howManyTimes):
             model = create_ANN(architecture, actHL, actLast, loss_f, input_shape, opt=optimizer)
             if trigger_early_stopping == False:
-                #In this case, every simulation entails max_nepochs epochs, therefore there is no need to correct the loss length
+                # In this case, every simulation entails max_nepochs epochs, therefore there is no need to correct the loss length
                 aux = model.fit(x_train, y_train, batch_size=BS, epochs=max_nepochs, verbose=verb, validation_data=(x_test,y_test))
                 aux_2 = np.array(aux.history['loss'])
                 aux_3 = np.array(aux.history['val_loss'])
             else:
-                #In this case, after each training, the loss and val_loss history may have a length shorter than max_nepochs.
+                # In this case, after each training, the loss and val_loss history may have a length shorter than max_nepochs.
                 aux = model.fit(x_train, y_train, batch_size=BS, epochs=max_nepochs, verbose=verb, callbacks=my_callbacks, validation_data=(x_test, y_test))
                 aux_2 = np.array(aux.history['loss'])
                 actual_length = np.shape(aux_2)[0]
@@ -403,35 +407,35 @@ shuffle=True, rts=None, verb=0, snitch_every=1):
                 aux_2 = correct_array_length(aux_2, max_nepochs, new_entries=0.0)
                 aux_3 = correct_array_length(aux_3, max_nepochs, new_entries=0.0)
                 aux_4 = correct_array_length(aux_4, max_nepochs, new_entries=0)
-                #Count the number of times that a training reached a certain epoch
+                # Count the number of times that a training reached a certain epoch
                 reached_this_epoch += aux_4
         
-            #Once the loss and the val_loss history is formatted suitably ((max_nepochs,)) regardless the truth value of
-            #trigger_early_stopping, I add up the results to the average.
+            # Once the loss and the val_loss history is formatted suitably ((max_nepochs,)) regardless the truth value of
+            # trigger_early_stopping, I add up the results to the average.
             loss_history += aux_2
             loss_history_squared += np.power(aux_2, 2)
             val_loss_history += aux_3
             val_loss_history_squared += np.power(aux_3, 2)
 
-            #Test the trained network
+            # Test the trained network
             test_results = test_results + multiple_test(model, x_test, y_test, tolerance)
             for j in range(len(first_test_filepath)):
                 test_results_2[j,:] = test_results_2[j,:] + multiple_test(model, x_test_2[j], y_test_2[j], tolerance)            
           
-            #Verbose
+            # Verbose
             if i%snitch_every==0:
                 print('Progress: ', 100*(i+1)/howManyTimes, '%') 
   
     else:
-        #In this case, no validation loss is studied.
+        # In this case, no validation loss is studied.
         for i in range(howManyTimes):
             model = create_ANN(architecture, actHL, actLast, loss_f, input_shape, opt=optimizer)
             if trigger_early_stopping == False:
-                #In this case, every simulation entails max_nepochs epochs, therefore there is no need to correct the loss length
+                # In this case, every simulation entails max_nepochs epochs, therefore there is no need to correct the loss length
                 aux = model.fit(x_train, y_train, batch_size=BS, epochs=max_nepochs, verbose=verb)
                 aux_2 = np.array(aux.history['loss'])
             else:
-                #In this case, after each training, the loss and val_loss history may have a length shorter than max_nepochs.
+                # In this case, after each training, the loss and val_loss history may have a length shorter than max_nepochs.
                 aux = model.fit(x_train, y_train, batch_size=BS, epochs=max_nepochs, verbose=verb, callbacks=my_callbacks)
                 aux_2 = np.array(aux.history['loss'])
                 actual_length = np.shape(aux_2)[0]
@@ -440,27 +444,27 @@ shuffle=True, rts=None, verb=0, snitch_every=1):
                 aux_4 = correct_array_length(aux_4, max_nepochs, new_entries=0)
                 reached_this_epoch += aux_4
         
-            #Once the loss is formatted suitably ((max_nepochs,)) regardless the truth value of
-            #trigger_early_stopping, I add up the results to the average.
+            # Once the loss is formatted suitably ((max_nepochs,)) regardless the truth value of
+            # trigger_early_stopping, I add up the results to the average.
             loss_history += aux_2
             loss_history_squared += np.power(aux_2, 2)
 
-            #Test the trained network
+            # Test the trained network
             test_results = test_results + multiple_test(model, x_test, y_test, tolerance)
             for j in range(len(first_test_filepath)):
                 test_results_2[j,:] = test_results_2[j,:] + multiple_test(model, x_test_2[j], y_test_2[j], tolerance)            
           
-            #Verbose
+            # Verbose
             if i%snitch_every==0:
                 print('Progress: ', 100*(i+1)/howManyTimes, '%') 
 
-    #If trigger_early_stopping==True and max_nepochs is too big compared to the usual number of epochs that it takes the NN to reach a
-    #plateau for the monitored metric, then it is probable that there are some entries at the end of loss_history, val_loss_history and
-    #reached_this_epoch that are null. These entries may cause division_by_zero errors when normalizing the results. Therefore, we must
-    #correct the length of such arrays so that those null entries are erased from the arrays.
+    # If trigger_early_stopping==True and max_nepochs is too big compared to the usual number of epochs that it takes the NN to reach a
+    # plateau for the monitored metric, then it is probable that there are some entries at the end of loss_history, val_loss_history and
+    # reached_this_epoch that are null. These entries may cause division_by_zero errors when normalizing the results. Therefore, we must
+    # correct the length of such arrays so that those null entries are erased from the arrays.
     pos = first_null_position(reached_this_epoch)
     if pos != -1:
-        #pos == -1 means that there was no null entry in reached_this_epoch.
+        # pos == -1 means that there was no null entry in reached_this_epoch.
         reached_this_epoch = correct_array_length(reached_this_epoch, pos)
         loss_history = correct_array_length(loss_history, pos)
         loss_history_squared = correct_array_length(loss_history_squared, pos)
@@ -468,19 +472,19 @@ shuffle=True, rts=None, verb=0, snitch_every=1):
             val_loss_history = correct_array_length(val_loss_history, pos)
             val_loss_history_squared = correct_array_length(val_loss_history_squared, pos)
 
-    #Normalize results and compute std's
-    loss_history = loss_history/reached_this_epoch  #The data for each epoch is normalized according to how many times such epoch was reached.
+    # Normalize results and compute std's
+    loss_history = loss_history/reached_this_epoch  # The data for each epoch is normalized according to how many times such epoch was reached.
     loss_history_squared = loss_history_squared/reached_this_epoch
     std = np.sqrt((loss_history_squared-np.power(loss_history,2))/reached_this_epoch)
-    #The sample std of a random variable which is, per definition, the average over multiple independent realizations of the same elementary random variable
-    #is the std of such elementary random variable divided by the square root of the number of independent realizations, in this case, howManyTimes. (*ref)
+    # The sample std of a random variable which is, per definition, the average over multiple independent realizations of the same elementary random variable
+    # is the std of such elementary random variable divided by the square root of the number of independent realizations, in this case, howManyTimes. (*ref)
 
     if use_validation_data == True:
         val_loss_history = val_loss_history/reached_this_epoch
         val_loss_history_squared = val_loss_history_squared/reached_this_epoch
         val_loss_std = np.sqrt((val_loss_history_squared-np.power(val_loss_history,2))/reached_this_epoch)
 
-    #Tests are always performed regardless early stopping, therefore they should be normalized to HowManyTimes.
+    # Tests are always performed regardless early stopping, therefore they should be normalized to HowManyTimes.
     test_results = test_results/howManyTimes
     howManyTestSamples = np.shape(test_results)[0]
     test_results_2 = test_results_2/howManyTimes
@@ -488,20 +492,21 @@ shuffle=True, rts=None, verb=0, snitch_every=1):
     if first_test_filepath==[]:
         howManyTestSamples2 = 0
     else:
+        # WARNING2: Here, we are making the same assumption as in WARNING1!
         howManyTestSamples2 = np.shape(test_results_2)[1]
 
     average_success_rate = np.mean(test_results)
-    #(*ref) In these cases, if I consider the elementary random variable to be the mean of the result of a multiple tests over the same
+    # (*ref) In these cases, if I consider the elementary random variable to be the mean of the result of a multiple tests over the same
     # single input sample (i.e. 1+0+0+1+1+0+0+1+1+0/howManyTimes, where 1 means correct labeling of the ANN and 0 means incorrect labeling),
-    #then I'm summing over howManyTestSamples. Therefore, the std of the average success rate is the std of the success rate divided
-    #by sqrt(howManyTestSamples)
+    # then I'm summing over howManyTestSamples. Therefore, the std of the average success rate is the std of the success rate divided
+    # by sqrt(howManyTestSamples)
     average_success_rate_std = np.sqrt((np.mean(np.power(test_results, 2))-np.power(np.mean(test_results), 2))/howManyTestSamples)
     average_success_rate_2 = []
     average_success_rate_std_2 = []
     for i in range(len(first_test_filepath)):
         average_success_rate_2.append(np.mean(test_results_2[i,:])) 
-        #No need to worry about dividing by zero in the following line since, if separable_test_filepath==[], then the body of this loop is
-        #performed not even once. 
+        # No need to worry about dividing by zero in the following line since, if separable_test_filepath==[], then the body of this loop is
+        # performed not even once. 
         aux = np.sqrt((np.mean(np.power(test_results_2[i,:], 2))-np.power(np.mean(test_results_2[i,:]), 2))/howManyTestSamples2)
         average_success_rate_std_2.append(aux)
 
